@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { PublicLayout } from "@/components/layout/public-layout";
@@ -6,10 +7,12 @@ import { Section } from "@/components/layout/section";
 import { FeaturedPost } from "@/components/blog/featured-post";
 import { PostCard } from "@/components/blog/post-card";
 import { ProjectFilter } from "@/components/portfolio/project-filter";
+import { ContentGate } from "@/components/content/content-state";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { blogFilters, blogPosts } from "@/data/blog";
+import { blogFilters, filterBlogPosts, type BlogFilter } from "@/lib/content";
+import { blogPostsQuery } from "@/lib/queries";
 
 export const Route = createFileRoute("/blog")({
   head: () => ({
@@ -26,14 +29,15 @@ export const Route = createFileRoute("/blog")({
 });
 
 function BlogPage() {
-  const [filter, setFilter] = useState<(typeof blogFilters)[number]>("All");
-  const featured = blogPosts[0];
-  const rest = blogPosts.slice(1);
+  const [filter, setFilter] = useState<BlogFilter>("All");
+  const { data: posts, isLoading, isError, error, refetch } = useQuery(
+    blogPostsQuery({ limit: "50" }),
+  );
 
-  const filtered =
-    filter === "All" ? rest : rest.filter((p) => p.category === filter);
-
-  const allTags = [...new Set(blogPosts.flatMap((p) => p.tags))];
+  const featured = (posts ?? []).find((p) => p.featured) ?? posts?.[0];
+  const rest = (posts ?? []).filter((p) => p.slug !== featured?.slug);
+  const filtered = filterBlogPosts(rest, filter);
+  const allTags = [...new Set((posts ?? []).flatMap((p) => p.tags))];
 
   function handleNewsletter(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -50,53 +54,65 @@ function BlogPage() {
       </div>
 
       <Section className="!pt-0">
-        <div className="grid lg:grid-cols-[1fr_280px] gap-10">
-          <div>
-            <FeaturedPost post={featured} />
-            <div className="mt-10">
-              <ProjectFilter options={blogFilters} active={filter} onChange={setFilter} />
-            </div>
-            <div className="mt-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-              {filtered.map((post) => (
-                <PostCard key={post.slug} post={post} compact />
-              ))}
-            </div>
-          </div>
-
-          <aside className="hidden lg:block space-y-6">
-            <Card className="p-5 bg-card">
-              <h3 className="font-display font-semibold">Get articles in your inbox</h3>
-              <form onSubmit={handleNewsletter} className="mt-4 space-y-3">
-                <Input type="email" placeholder="your@email.com" required />
-                <Button type="submit" className="w-full">
-                  Subscribe
-                </Button>
-              </form>
-            </Card>
-            <Card className="p-5 bg-card">
-              <h3 className="text-sm font-semibold mb-3">Popular tags</h3>
-              <div className="flex flex-wrap gap-2">
-                {allTags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-2 py-1 rounded-full text-xs bg-secondary text-muted-foreground"
-                  >
-                    #{tag}
-                  </span>
+        <ContentGate
+          isLoading={isLoading}
+          isError={isError}
+          error={error}
+          onRetry={() => refetch()}
+        >
+          <div className="grid lg:grid-cols-[1fr_280px] gap-10">
+            <div>
+              {featured && <FeaturedPost post={featured} />}
+              <div className="mt-10">
+                <ProjectFilter options={blogFilters} active={filter} onChange={setFilter} />
+              </div>
+              <div className="mt-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                {filtered.map((post) => (
+                  <PostCard key={post.slug} post={post} compact />
                 ))}
               </div>
-            </Card>
-            <Card className="p-5 bg-gold-dim border-gold-soft">
-              <h3 className="font-display font-semibold">Start a Project</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Ready to build your digital presence?
-              </p>
-              <Button asChild className="mt-4 w-full">
-                <Link to="/contact">Get in touch</Link>
-              </Button>
-            </Card>
-          </aside>
-        </div>
+              {filtered.length === 0 && (
+                <p className="mt-10 text-center text-muted-foreground">
+                  No articles in this category.
+                </p>
+              )}
+            </div>
+
+            <aside className="hidden lg:block space-y-6">
+              <Card className="p-5 bg-card">
+                <h3 className="font-display font-semibold">Get articles in your inbox</h3>
+                <form onSubmit={handleNewsletter} className="mt-4 space-y-3">
+                  <Input type="email" placeholder="your@email.com" required />
+                  <Button type="submit" className="w-full">
+                    Subscribe
+                  </Button>
+                </form>
+              </Card>
+              <Card className="p-5 bg-card">
+                <h3 className="text-sm font-semibold mb-3">Popular tags</h3>
+                <div className="flex flex-wrap gap-2">
+                  {allTags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2 py-1 rounded-full text-xs bg-secondary text-muted-foreground"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              </Card>
+              <Card className="p-5 bg-gold-dim border-gold-soft">
+                <h3 className="font-display font-semibold">Start a Project</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Ready to build your digital presence?
+                </p>
+                <Button asChild className="mt-4 w-full">
+                  <Link to="/contact">Get in touch</Link>
+                </Button>
+              </Card>
+            </aside>
+          </div>
+        </ContentGate>
       </Section>
     </PublicLayout>
   );

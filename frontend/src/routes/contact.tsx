@@ -12,6 +12,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useLanguage } from "@/context/language-context";
+import { useSiteSettings } from "@/hooks/use-site-settings";
+import { telegramLink, whatsappLink } from "@/lib/site-settings";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -44,6 +46,31 @@ const contactFaqs = [
 
 function ContactPage() {
   const { t } = useLanguage();
+  const settings = useSiteSettings();
+
+  const channels = [
+    {
+      icon: Mail,
+      title: "Email",
+      value: settings.contact_email,
+      hint: "We reply within 24 hours",
+      href: `mailto:${settings.contact_email}`,
+    },
+    {
+      icon: MessageCircle,
+      title: "WhatsApp",
+      value: settings.whatsapp_number,
+      hint: "Chat with us directly",
+      href: whatsappLink(settings.whatsapp_number),
+    },
+    {
+      icon: Send,
+      title: "Telegram",
+      value: settings.telegram_handle,
+      hint: "Message us on Telegram",
+      href: telegramLink(settings.telegram_handle),
+    },
+  ];
 
   return (
     <PublicLayout>
@@ -60,36 +87,19 @@ function ContactPage() {
           <div>
             <h2 className="font-display text-xl font-semibold">Or reach us directly</h2>
             <div className="mt-6 space-y-4">
-              {[
-                {
-                  icon: Mail,
-                  title: "Email",
-                  value: "hello@raafat.digital",
-                  hint: "We reply within 24 hours",
-                  href: "mailto:hello@raafat.digital",
-                },
-                {
-                  icon: MessageCircle,
-                  title: "WhatsApp",
-                  value: "+251 XXX XXX XXX",
-                  hint: "Chat with us directly",
-                  href: "https://wa.me/251XXXXXXXXX",
-                },
-                {
-                  icon: Send,
-                  title: "Telegram",
-                  value: "@raafatdigital",
-                  hint: "Message us on Telegram",
-                  href: "https://t.me/raafatdigital",
-                },
-              ].map((item) => (
+              {channels.map((item) => (
                 <Card key={item.title} className="p-5 bg-card flex gap-4">
                   <div className="h-10 w-10 rounded-lg bg-gold-dim border border-gold-soft flex items-center justify-center text-gold flex-shrink-0">
                     <item.icon className="h-5 w-5" />
                   </div>
                   <div>
                     <p className="font-medium">{item.title}</p>
-                    <a href={item.href} className="text-sm text-gold hover:underline">
+                    <a
+                      href={item.href}
+                      target={item.title !== "Email" ? "_blank" : undefined}
+                      rel={item.title !== "Email" ? "noopener noreferrer" : undefined}
+                      className="text-sm text-gold hover:underline"
+                    >
                       {item.value}
                     </a>
                     <p className="text-xs text-muted-foreground mt-1">{item.hint}</p>
@@ -101,20 +111,12 @@ function ContactPage() {
                   <Calendar className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="font-medium">Book a Call</p>
-                  <p className="text-sm text-muted-foreground">
-                    Schedule a free 30-minute discovery call
-                  </p>
-                  <Button asChild variant="outline" size="sm" className="mt-3 border-gold-soft">
-                    <a href="#">Book a Call →</a>
-                  </Button>
+                  <p className="font-medium">Office hours</p>
+                  <p className="text-sm text-muted-foreground">{settings.office_hours}</p>
+                  <p className="text-xs text-muted-foreground mt-2">📍 {settings.address}</p>
                 </div>
               </Card>
             </div>
-            <p className="mt-6 text-sm text-muted-foreground">
-              📍 Harar, Ethiopia — serving clients nationwide
-            </p>
-            <p className="text-sm text-muted-foreground">Mon–Fri, 9:00 AM – 6:00 PM EAT</p>
           </div>
         </div>
       </Section>

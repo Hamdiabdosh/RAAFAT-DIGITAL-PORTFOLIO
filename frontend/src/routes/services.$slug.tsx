@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Check } from "lucide-react";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { Section } from "@/components/layout/section";
@@ -10,42 +11,49 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { ProjectCard } from "@/components/portfolio/project-card";
-import { getServiceBySlug } from "@/data/services";
-import { projects } from "@/data/portfolio";
+import { serviceSlugToProjectCategory } from "@/lib/content";
+import { projectsQuery, serviceBySlugQuery } from "@/lib/queries";
 
 export const Route = createFileRoute("/services/$slug")({
-  head: ({ params }) => {
-    const service = getServiceBySlug(params.slug);
-    return {
-      meta: [
-        {
-          title: service
-            ? `${service.title} — RAAFAT-DIGITAL`
-            : "Service — RAAFAT-DIGITAL",
-        },
-        {
-          name: "description",
-          content: service?.shortDescription ?? "Service details",
-        },
-      ],
-    };
+  loader: async ({ params, context: { queryClient } }) => {
+    try {
+      return await queryClient.ensureQueryData(serviceBySlugQuery(params.slug));
+    } catch {
+      throw notFound();
+    }
   },
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: loaderData
+          ? `${loaderData.title} — RAAFAT-DIGITAL`
+          : "Service — RAAFAT-DIGITAL",
+      },
+      {
+        name: "description",
+        content: loaderData?.subtitle ?? "Service details",
+      },
+    ],
+  }),
   component: ServiceDetailPage,
 });
 
 function ServiceDetailPage() {
   const { slug } = Route.useParams();
-  const service = getServiceBySlug(slug);
-  if (!service) throw notFound();
+  const service = Route.useLoaderData();
+  const category = serviceSlugToProjectCategory[slug];
 
-  const related = projects.filter((p) => p.category === service.category).slice(0, 2);
+  const { data: allProjects } = useQuery(projectsQuery());
+  const related = category
+    ? (allProjects ?? []).filter((p) => p.category === category).slice(0, 2)
+    : [];
 
   return (
     <PublicLayout>
       <div className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-b border-border">
-        <p className="text-xs uppercase tracking-[0.2em] text-gold font-semibold">{service.category}</p>
+        <p className="text-xs uppercase tracking-[0.2em] text-gold font-semibold">Service</p>
         <h1 className="mt-3 font-display text-4xl sm:text-5xl font-bold">{service.title}</h1>
-        <p className="mt-4 text-muted-foreground max-w-2xl">{service.fullDescription}</p>
+        <p className="mt-4 text-muted-foreground max-w-2xl">{service.description}</p>
       </div>
 
       <Section>
@@ -63,9 +71,11 @@ function ServiceDetailPage() {
       <Section className="!pt-0">
         <h2 className="font-display text-2xl font-bold">Our Process</h2>
         <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {service.process.map((step, i) => (
+          {service.processSteps.map((step, i) => (
             <div key={step.title}>
-              <span className="text-gold font-display font-bold">0{i + 1}</span>
+              <span className="text-gold font-display font-bold">
+                {String(step.step ?? i + 1).padStart(2, "0")}
+              </span>
               <h3 className="mt-2 font-semibold">{step.title}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{step.description}</p>
             </div>
@@ -82,17 +92,21 @@ function ServiceDetailPage() {
         </div>
       </Section>
 
-      <Section className="!pt-0">
-        <h2 className="font-display text-2xl font-bold mb-6">FAQ</h2>
-        <Accordion type="single" collapsible className="max-w-2xl">
-          {service.faq.map((item, i) => (
-            <AccordionItem key={item.q} value={`sq-${i}`}>
-              <AccordionTrigger>{item.q}</AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">{item.a}</AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </Section>
+      {service.faqs.length > 0 && (
+        <Section className="!pt-0">
+          <h2 className="font-display text-2xl font-bold mb-6">FAQ</h2>
+          <Accordion type="single" collapsible className="max-w-2xl">
+            {service.faqs.map((item, i) => (
+              <AccordionItem key={item.question} value={`sq-${i}`}>
+                <AccordionTrigger>{item.question}</AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  {item.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </Section>
+      )}
 
       {related.length > 0 && (
         <Section>

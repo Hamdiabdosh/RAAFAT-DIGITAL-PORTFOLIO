@@ -1,8 +1,21 @@
+import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/context/language-context";
+import { projectsQuery } from "@/lib/queries";
 
 export function SocialProof() {
   const { t } = useLanguage();
-  const logos = Array.from({ length: 12 }, (_, i) => `Client Logo ${(i % 6) + 1}`);
+  const { data: projects } = useQuery(projectsQuery());
+
+  const clients = [
+    ...new Set((projects ?? []).map((p) => p.client).filter(Boolean)),
+  ];
+
+  const labels =
+    clients.length > 0
+      ? clients
+      : (projects ?? []).map((p) => p.title).slice(0, 6);
+
+  const marquee = labels.length > 0 ? labels : ["RAAFAT-DIGITAL"];
 
   return (
     <section className="py-12 border-y border-border bg-card overflow-hidden">
@@ -23,10 +36,10 @@ export function SocialProof() {
       </p>
       <div className="relative">
         <div className="flex marquee-track w-max gap-6">
-          {[...logos, ...logos].map((label, i) => (
+          {[...marquee, ...marquee].map((label, i) => (
             <div
               key={`${label}-${i}`}
-              className="flex-shrink-0 w-32 h-16 rounded-lg bg-secondary border border-border flex items-center justify-center text-xs text-muted-foreground"
+              className="flex-shrink-0 min-w-[8rem] max-w-[12rem] h-16 px-4 rounded-lg bg-secondary border border-border flex items-center justify-center text-xs text-muted-foreground text-center font-medium"
             >
               {label}
             </div>

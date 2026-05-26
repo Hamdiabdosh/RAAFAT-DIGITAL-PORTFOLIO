@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { Section } from "@/components/layout/section";
+import { useSiteSettings } from "@/hooks/use-site-settings";
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
@@ -12,30 +13,32 @@ export const Route = createFileRoute("/terms")({
   component: TermsPage,
 });
 
-const sections = [
-  {
-    title: "Scope of Services",
-    body: "Lorem ipsum dolor sit amet. RAAFAT-DIGITAL provides web design, branding, custom software, and e-commerce services as agreed in individual project proposals.",
-  },
-  {
-    title: "Payment Terms",
-    body: "Sed do eiusmod tempor. Payment schedules are defined per project. Deposits may be required before work begins on larger engagements.",
-  },
-  {
-    title: "Intellectual Property",
-    body: "Ut enim ad minim veniam. Upon full payment, clients receive agreed deliverables and usage rights as specified in the project contract.",
-  },
-  {
-    title: "Revisions & Changes",
-    body: "Quis nostrud exercitation. Scope changes may affect timeline and cost. We communicate changes clearly before proceeding.",
-  },
-  {
-    title: "Liability",
-    body: "Duis aute irure dolor. Our liability is limited to the fees paid for the specific project, except where prohibited by applicable law.",
-  },
-];
-
 function TermsPage() {
+  const { site_name: siteName, contact_email: email } = useSiteSettings();
+
+  const sections = [
+    {
+      title: "Scope of Services",
+      body: `${siteName} provides web design, branding, custom software, and e-commerce services as described in individual proposals and statements of work agreed with each client.`,
+    },
+    {
+      title: "Payment Terms",
+      body: "Payment schedules are defined per project. Deposits may be required before work begins on larger engagements. Invoices are due according to the dates stated in your proposal unless otherwise agreed in writing.",
+    },
+    {
+      title: "Intellectual Property",
+      body: "Upon full payment for agreed deliverables, clients receive the usage rights specified in the project contract. Third-party assets, fonts, and licensed components remain subject to their respective licenses.",
+    },
+    {
+      title: "Revisions & Changes",
+      body: "Scope changes may affect timeline and cost. We document changes clearly and confirm approval before proceeding with work outside the original agreement.",
+    },
+    {
+      title: "Liability",
+      body: `Our liability is limited to the fees paid for the specific project, except where prohibited by applicable law. Questions about these terms may be sent to ${email}.`,
+    },
+  ];
+
   return (
     <PublicLayout>
       <Section>

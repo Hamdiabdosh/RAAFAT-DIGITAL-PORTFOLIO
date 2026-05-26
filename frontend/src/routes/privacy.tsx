@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { Section } from "@/components/layout/section";
+import { useSiteSettings } from "@/hooks/use-site-settings";
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({
@@ -12,30 +13,32 @@ export const Route = createFileRoute("/privacy")({
   component: PrivacyPage,
 });
 
-const sections = [
-  {
-    title: "Data We Collect",
-    body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. We may collect information you provide via contact forms, including name, email, phone number, and project details.",
-  },
-  {
-    title: "How We Use It",
-    body: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Your information is used to respond to inquiries, provide services, and improve our offerings.",
-  },
-  {
-    title: "Cookies & Analytics",
-    body: "Ut enim ad minim veniam, quis nostrud exercitation. We may use cookies and analytics tools to understand site usage and improve user experience.",
-  },
-  {
-    title: "Your Rights",
-    body: "Duis aute irure dolor in reprehenderit. You may request access, correction, or deletion of your personal data by contacting hello@raafat.digital.",
-  },
-  {
-    title: "Contact",
-    body: "For privacy-related questions, email us at hello@raafat.digital.",
-  },
-];
-
 function PrivacyPage() {
+  const { contact_email: email } = useSiteSettings();
+
+  const sections = [
+    {
+      title: "Data We Collect",
+      body: `When you contact us or request a quote, we may collect your name, email address, phone number, company details, and information about your project. We only collect what you choose to share through our contact form or direct communication.`,
+    },
+    {
+      title: "How We Use It",
+      body: "We use your information to respond to inquiries, prepare proposals, deliver contracted services, and improve how we support clients. We do not sell your personal data to third parties.",
+    },
+    {
+      title: "Cookies & Analytics",
+      body: "Our website may use cookies and analytics tools to understand how visitors use the site and to improve performance and content. You can control cookies through your browser settings.",
+    },
+    {
+      title: "Your Rights",
+      body: `You may request access, correction, or deletion of personal data we hold about you. Contact us at ${email} and we will respond within a reasonable timeframe.`,
+    },
+    {
+      title: "Contact",
+      body: `For privacy-related questions, email us at ${email}.`,
+    },
+  ];
+
   return (
     <PublicLayout>
       <Section>

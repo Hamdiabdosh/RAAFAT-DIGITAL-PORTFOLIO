@@ -2,6 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
+import { api } from "@/lib/api";
+import { setAdminToken } from "@/lib/auth";
 import { AuthLayout } from "@/components/layout/auth-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,14 +20,23 @@ function LoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = e.currentTarget;
+    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
+
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const { token } = await api.login({ email, password });
+      setAdminToken(token);
       toast.success("Welcome back");
-      setLoading(false);
       navigate({ to: "/dashboard" });
-    }, 700);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -37,11 +48,11 @@ function LoginPage() {
       <form className="space-y-4" onSubmit={onSubmit}>
         <div className="space-y-1.5">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="you@company.com" required />
+          <Input id="email" name="email" type="email" placeholder="you@company.com" required />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="password">Password</Label>
-          <PasswordInput id="password" placeholder="••••••••" required />
+          <PasswordInput id="password" name="password" placeholder="••••••••" required />
         </div>
         <div className="flex items-center justify-between">
           <label className="flex items-center gap-2 text-sm text-muted-foreground">

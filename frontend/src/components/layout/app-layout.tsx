@@ -19,7 +19,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <div className="flex items-center gap-2">
               <ThemeToggle />
               <Button asChild size="sm">
-                <Link to="/dashboard/projects">
+                <Link to="/dashboard/projects" search={{ create: "1" }}>
                   <Plus className="h-4 w-4" />
                   New Project
                 </Link>

@@ -3,9 +3,12 @@ import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/layout/section";
 import { useLanguage } from "@/context/language-context";
+import { useSiteSettings } from "@/hooks/use-site-settings";
+import { whatsappLink } from "@/lib/site-settings";
 
 export function CtaSection() {
   const { t } = useLanguage();
+  const settings = useSiteSettings();
 
   return (
     <Section>
@@ -17,13 +20,25 @@ export function CtaSection() {
             <Link to="/contact">{t("sections.ctaPrimary")}</Link>
           </Button>
           <Button asChild size="lg" variant="outline">
-            <a href="https://wa.me/251XXXXXXXXX" target="_blank" rel="noopener noreferrer">
+            <a
+              href={whatsappLink(settings.whatsapp_number)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <MessageCircle className="h-4 w-4" />
               {t("sections.ctaWhatsapp")}
             </a>
           </Button>
         </div>
-        <p className="mt-6 text-sm text-muted-foreground">{t("sections.ctaEmail")}</p>
+        <p className="mt-6 text-sm text-muted-foreground">
+          {t("sections.ctaEmailPrefix")}{" "}
+          <a
+            href={`mailto:${settings.contact_email}`}
+            className="text-gold hover:underline"
+          >
+            {settings.contact_email}
+          </a>
+        </p>
       </div>
     </Section>
   );

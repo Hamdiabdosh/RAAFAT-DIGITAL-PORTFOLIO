@@ -7,9 +7,19 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { useLanguage } from "@/context/language-context";
+import { useSiteSettings } from "@/hooks/use-site-settings";
+import { telegramLink, whatsappLink } from "@/lib/site-settings";
 
 export function Footer() {
   const { t } = useLanguage();
+  const settings = useSiteSettings();
+
+  const socialLinks = [
+    { icon: Linkedin, label: "LinkedIn", href: settings.linkedin_url },
+    { icon: Send, label: "Telegram", href: telegramLink(settings.telegram_handle) },
+    { icon: MessageCircle, label: "WhatsApp", href: whatsappLink(settings.whatsapp_number) },
+    { icon: Instagram, label: "Instagram", href: settings.instagram_url },
+  ].filter((s) => s.href && s.href !== "#");
 
   return (
     <footer className="border-t border-border bg-card mt-24">
@@ -17,32 +27,24 @@ export function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           <div>
             <Logo size="lg" />
-            <p className="mt-3 text-sm font-medium text-gold">{t("footer.tagline")}</p>
+            <p className="mt-3 text-sm font-medium text-gold">{settings.tagline}</p>
             <p className="mt-2 text-sm text-muted-foreground">{t("footer.about")}</p>
-            <div className="mt-4 flex gap-3">
-              {[
-                { icon: Linkedin, label: "LinkedIn" },
-                { icon: Send, label: "Telegram" },
-                { icon: MessageCircle, label: "WhatsApp" },
-                { icon: Instagram, label: "Instagram" },
-              ].map(({ icon: Icon, label }) => (
-                <a
-                  key={label}
-                  href="#"
-                  className="h-9 w-9 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-gold hover:border-gold-soft transition-colors"
-                  aria-label={label}
-                >
-                  <Icon className="h-4 w-4" />
-                </a>
-              ))}
-              <a
-                href="#"
-                className="h-9 w-9 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-gold hover:border-gold-soft transition-colors text-xs font-bold"
-                aria-label="TikTok"
-              >
-                TT
-              </a>
-            </div>
+            {socialLinks.length > 0 && (
+              <div className="mt-4 flex gap-3">
+                {socialLinks.map(({ icon: Icon, label, href }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="h-9 w-9 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-gold hover:border-gold-soft transition-colors"
+                    aria-label={label}
+                  >
+                    <Icon className="h-4 w-4" />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
           <div>
@@ -51,12 +53,12 @@ export function Footer() {
             </h4>
             <ul className="mt-4 space-y-2">
               {[
-                { label: t("footer.webDev"), to: "/services" },
-                { label: t("footer.branding"), to: "/services" },
-                { label: t("footer.software"), to: "/services" },
-                { label: t("footer.ecommerce"), to: "/services" },
+                { label: t("footer.webDev"), to: "/services/web-development" },
+                { label: t("footer.branding"), to: "/services/branding" },
+                { label: t("footer.software"), to: "/services/custom-software" },
+                { label: t("footer.ecommerce"), to: "/services/ecommerce" },
               ].map((l) => (
-                <li key={l.label}>
+                <li key={l.to}>
                   <Link to={l.to} className="text-sm text-foreground/80 hover:text-gold transition-colors">
                     {l.label}
                   </Link>
@@ -72,13 +74,13 @@ export function Footer() {
             <ul className="mt-4 space-y-2">
               {[
                 { label: "About", to: "/about" },
-                { label: "Portfolio", to: "/portfolio" },
+                { label: t("nav.projects"), to: "/portfolio" },
                 { label: "Blog", to: "/blog" },
                 { label: "Contact", to: "/contact" },
                 { label: "Privacy Policy", to: "/privacy" },
                 { label: "Terms", to: "/terms" },
               ].map((l) => (
-                <li key={l.label}>
+                <li key={l.to}>
                   <Link to={l.to} className="text-sm text-foreground/80 hover:text-gold transition-colors">
                     {l.label}
                   </Link>
@@ -93,12 +95,25 @@ export function Footer() {
             </h4>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
               <li>
-                <a href="mailto:hello@raafat.digital" className="hover:text-gold transition-colors">
-                  hello@raafat.digital
+                <a
+                  href={`mailto:${settings.contact_email}`}
+                  className="hover:text-gold transition-colors"
+                >
+                  {settings.contact_email}
                 </a>
               </li>
-              <li>WhatsApp: +251 XXX XXX XXX</li>
-              <li>📍 Harar, Ethiopia</li>
+              <li>
+                <a
+                  href={whatsappLink(settings.whatsapp_number)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-gold transition-colors"
+                >
+                  WhatsApp: {settings.whatsapp_number}
+                </a>
+              </li>
+              <li>📍 {settings.address}</li>
+              <li>{settings.office_hours}</li>
             </ul>
           </div>
         </div>

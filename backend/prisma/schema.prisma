@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String   @default("Raafat")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model ContactMessage {
+  id              String        @id @default(cuid())
+  name            String
+  email           String
+  phone           String?
+  serviceInterest String?
+  budgetRange     String?
+  description     String
+  hearAboutUs     String?
+  status          MessageStatus @default(UNREAD)
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+enum MessageStatus {
+  UNREAD
+  READ
+  REPLIED
+  ARCHIVED
+}
+
+model Project {
+  id           String          @id @default(cuid())
+  slug         String          @unique
+  title        String
+  client       String
+  clientType   String
+  category     ProjectCategory
+  description  String
+  challenge    String
+  solution     String
+  result       String
+  technologies String[]
+  timeline     String
+  coverImage   String?
+  images       String[]
+  metrics      Json?
+  featured     Boolean         @default(false)
+  published    Boolean         @default(true)
+  order        Int             @default(0)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+}
+
+enum ProjectCategory {
+  WEB_DEVELOPMENT
+  BRANDING
+  CUSTOM_SOFTWARE
+  ECOMMERCE
+}
+
+model BlogPost {
+  id          String       @id @default(cuid())
+  slug        String       @unique
+  title       String
+  excerpt     String
+  content     String
+  category    BlogCategory
+  coverImage  String?
+  readTime    Int
+  published   Boolean      @default(false)
+  featured    Boolean      @default(false)
+  tags        String[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  publishedAt DateTime?
+}
+
+enum BlogCategory {
+  WEB_DEVELOPMENT
+  BRANDING
+  ECOMMERCE
+  BUSINESS
+  DESIGN
+}
+
+model Service {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  subtitle      String
+  description   String
+  icon          String
+  startingPrice String
+  includes      String[]
+  processSteps  Json[]
+  faqs          Json[]
+  order         Int      @default(0)
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  role      String
+  company   String?
+  quote     String
+  avatar    String?
+  rating    Int      @default(5)
+  featured  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}

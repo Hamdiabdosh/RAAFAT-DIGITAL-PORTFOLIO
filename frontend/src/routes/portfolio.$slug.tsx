@@ -1,36 +1,55 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ImagePlaceholder } from "@/components/ui/image-placeholder";
+import { MediaImage } from "@/components/ui/media-image";
 import { ProjectCard } from "@/components/portfolio/project-card";
-import { getProjectBySlug, projects } from "@/data/portfolio";
+import { projectCategoryLabels, projectMetrics } from "@/lib/content";
+import { projectBySlugQuery, projectsQuery } from "@/lib/queries";
 
 export const Route = createFileRoute("/portfolio/$slug")({
-  head: ({ params }) => {
-    const project = getProjectBySlug(params.slug);
-    return {
-      meta: [
-        { title: project ? `${project.title} — RAAFAT-DIGITAL` : "Case Study — RAAFAT-DIGITAL" },
-        { name: "description", content: project?.description ?? "Project case study" },
-      ],
-    };
+  loader: async ({ params, context: { queryClient } }) => {
+    try {
+      return await queryClient.ensureQueryData(projectBySlugQuery(params.slug));
+    } catch {
+      throw notFound();
+    }
   },
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: loaderData
+          ? `${loaderData.title} — RAAFAT-DIGITAL`
+          : "Case Study — RAAFAT-DIGITAL",
+      },
+      { name: "description", content: loaderData?.description ?? "Project case study" },
+    ],
+  }),
   component: CaseStudyPage,
 });
 
 function CaseStudyPage() {
-  const { slug } = Route.useParams();
-  const project = getProjectBySlug(slug);
-  if (!project) throw notFound();
+  const project = Route.useLoaderData();
+  const { data: allProjects } = useQuery(projectsQuery());
 
-  const related = projects.filter((p) => p.slug !== slug).slice(0, 2);
+  const related = (allProjects ?? [])
+    .filter((p) => p.slug !== project.slug && p.category === project.category)
+    .slice(0, 2);
+
+  const metrics = projectMetrics(project.metrics);
+  const gallery = [
+    ...(project.coverImage ? [project.coverImage] : []),
+    ...project.images,
+  ];
 
   return (
     <PublicLayout>
       <div className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <p className="text-xs uppercase tracking-[0.2em] text-gold font-semibold">{project.category}</p>
+        <p className="text-xs uppercase tracking-[0.2em] text-gold font-semibold">
+          {projectCategoryLabels[project.category]}
+        </p>
         <h1 className="mt-3 font-display text-4xl sm:text-5xl font-bold">{project.title}</h1>
         <p className="mt-2 text-muted-foreground">{project.clientType}</p>
       </div>
@@ -54,25 +73,41 @@ function CaseStudyPage() {
         <div className="grid lg:grid-cols-3 gap-10">
           <div className="lg:col-span-2 space-y-8">
             <div>
-              <h2 className="font-display text-2xl font-bold">Process</h2>
-              <ol className="mt-4 space-y-2 list-decimal list-inside text-muted-foreground">
-                {project.process.map((step) => (
-                  <li key={step}>{step}</li>
+              <h2 className="font-display text-2xl font-bold">Technologies</h2>
+              <ul className="mt-4 flex flex-wrap gap-2">
+                {project.technologies.map((tech) => (
+                  <li
+                    key={tech}
+                    className="px-3 py-1 rounded-full text-sm bg-secondary text-muted-foreground"
+                  >
+                    {tech}
+                  </li>
                 ))}
-              </ol>
+              </ul>
             </div>
-            <div className="grid gap-5">
-              {["Screenshot 1", "Screenshot 2", "Screenshot 3"].map((label) => (
-                <ImagePlaceholder key={label} label={label} />
-              ))}
-            </div>
+            {gallery.length > 0 && (
+              <div className="grid gap-5">
+                {gallery.map((src, i) => (
+                  <MediaImage
+                    key={`${src}-${i}`}
+                    src={src}
+                    alt={`${project.title} — ${i + 1}`}
+                    label={project.title}
+                  />
+                ))}
+              </div>
+            )}
           </div>
           <Card className="p-6 h-fit bg-card">
             <h3 className="font-display font-semibold">Project Details</h3>
             <dl className="mt-4 space-y-4 text-sm">
               <div>
+                <dt className="text-muted-foreground">Client</dt>
+                <dd className="font-medium">{project.client}</dd>
+              </div>
+              <div>
                 <dt className="text-muted-foreground">Service</dt>
-                <dd className="font-medium">{project.category}</dd>
+                <dd className="font-medium">{projectCategoryLabels[project.category]}</dd>
               </div>
               <div>
                 <dt className="text-muted-foreground">Timeline</dt>
@@ -87,30 +122,34 @@ function CaseStudyPage() {
         </div>
       </Section>
 
-      <Section className="!pt-0">
-        <div className="grid sm:grid-cols-3 gap-5">
-          {project.metrics.map((m) => (
-            <Card key={m.label} className="p-6 text-center bg-card">
-              <p className="font-display text-3xl text-gold font-bold">{m.value}</p>
-              <p className="mt-2 text-sm text-muted-foreground">{m.label}</p>
-            </Card>
-          ))}
-        </div>
-        <div className="mt-10 text-center">
-          <Button asChild size="lg">
-            <Link to="/contact">Start a similar project →</Link>
-          </Button>
-        </div>
-      </Section>
+      {metrics.length > 0 && (
+        <Section className="!pt-0">
+          <div className="grid sm:grid-cols-3 gap-5">
+            {metrics.map((m) => (
+              <Card key={m.label} className="p-6 text-center bg-card">
+                <p className="font-display text-3xl text-gold font-bold">{m.value}</p>
+                <p className="mt-2 text-sm text-muted-foreground">{m.label}</p>
+              </Card>
+            ))}
+          </div>
+          <div className="mt-10 text-center">
+            <Button asChild size="lg">
+              <Link to="/contact">Start a similar project →</Link>
+            </Button>
+          </div>
+        </Section>
+      )}
 
-      <Section>
-        <h2 className="font-display text-2xl font-bold mb-8">Related Projects</h2>
-        <div className="grid md:grid-cols-2 gap-5">
-          {related.map((p) => (
-            <ProjectCard key={p.slug} project={p} />
-          ))}
-        </div>
-      </Section>
+      {related.length > 0 && (
+        <Section>
+          <h2 className="font-display text-2xl font-bold mb-8">Related Projects</h2>
+          <div className="grid md:grid-cols-2 gap-5">
+            {related.map((p) => (
+              <ProjectCard key={p.slug} project={p} />
+            ))}
+          </div>
+        </Section>
+      )}
     </PublicLayout>
   );
 }

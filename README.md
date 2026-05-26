@@ -5,14 +5,23 @@ Public marketing website for **RAAFAT-DIGITAL** — Ethiopia's digital agency. T
 ## Stack
 
 - **Frontend:** React 19, TanStack Router, Tailwind CSS v4, shadcn/ui
-- **Backend:** Node.js (planned — `backend/` placeholder)
+- **Backend:** Node.js, Express, PostgreSQL (Prisma) — see `backend/README.md`
 
 ## Getting started
 
 ```bash
+# Frontend
 cd frontend
 bun install
 bun run dev
+
+# Backend (separate terminal)
+cd backend
+npm install
+cp .env.example .env
+npm run db:migrate:dev
+npm run db:seed
+npm run dev
 ```
 
 Build for production:

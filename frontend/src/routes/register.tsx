@@ -34,7 +34,7 @@ function RegisterPage() {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast.success("Account created");
-    navigate({ to: "/dashboard" });
+    navigate({ to: "/login" });
   };
 
   return (
@@ -46,7 +46,7 @@ function RegisterPage() {
       <form className="space-y-4" onSubmit={onSubmit}>
         <div className="space-y-1.5">
           <Label htmlFor="name">Full name</Label>
-          <Input id="name" placeholder="Ada Morrison" required />
+          <Input id="name" placeholder="Your name" required />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="email">Email</Label>
@@ -68,7 +68,7 @@ function RegisterPage() {
         </div>
         <label className="flex items-start gap-2 text-sm text-muted-foreground">
           <Checkbox id="terms" required className="mt-0.5" />
-          <span>I agree to the <a href="#" className="text-gold hover:underline">Terms of Service</a> and <a href="#" className="text-gold hover:underline">Privacy Policy</a></span>
+          <span>I agree to the <Link to="/terms" className="text-gold hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-gold hover:underline">Privacy Policy</Link></span>
         </label>
         <Button type="submit" className="w-full">
           Create Account <ArrowRight className="h-4 w-4" />

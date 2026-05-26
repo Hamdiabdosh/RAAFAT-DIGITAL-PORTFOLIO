@@ -1,10 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { Section } from "@/components/layout/section";
 import { ProjectCard } from "@/components/portfolio/project-card";
 import { ProjectFilter } from "@/components/portfolio/project-filter";
-import { portfolioFilters, projects } from "@/data/portfolio";
+import { ContentGate } from "@/components/content/content-state";
+import { filterProjects, portfolioFilters, type PortfolioFilter } from "@/lib/content";
+import { projectsQuery } from "@/lib/queries";
 
 export const Route = createFileRoute("/portfolio")({
   head: () => ({
@@ -18,12 +21,10 @@ export const Route = createFileRoute("/portfolio")({
 });
 
 function PortfolioPage() {
-  const [filter, setFilter] = useState<(typeof portfolioFilters)[number]>("All");
+  const [filter, setFilter] = useState<PortfolioFilter>("All");
+  const { data, isLoading, isError, error, refetch } = useQuery(projectsQuery());
 
-  const filtered =
-    filter === "All"
-      ? projects
-      : projects.filter((p) => p.category === filter);
+  const filtered = filterProjects(data ?? [], filter);
 
   return (
     <PublicLayout>
@@ -36,10 +37,23 @@ function PortfolioPage() {
 
       <Section className="!pt-0">
         <ProjectFilter options={portfolioFilters} active={filter} onChange={setFilter} />
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filtered.map((p) => (
-            <ProjectCard key={p.slug} project={p} />
-          ))}
+        <div className="mt-12">
+          <ContentGate
+            isLoading={isLoading}
+            isError={isError}
+            error={error}
+            onRetry={() => refetch()}
+            skeletonRows={6}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filtered.map((p) => (
+                <ProjectCard key={p.slug} project={p} />
+              ))}
+            </div>
+            {filtered.length === 0 && (
+              <p className="text-center text-muted-foreground py-12">No projects in this category.</p>
+            )}
+          </ContentGate>
         </div>
       </Section>
     </PublicLayout>

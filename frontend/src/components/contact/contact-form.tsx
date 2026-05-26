@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -50,10 +51,22 @@ export function ContactForm() {
     },
   });
 
-  function onSubmit(data: FormValues) {
-    console.log("Contact form submission:", data);
-    toast.success(t("contact.success"));
-    form.reset();
+  async function onSubmit(data: FormValues) {
+    try {
+      await api.submitContact({
+        fullName: data.fullName,
+        email: data.email,
+        phone: data.phone || undefined,
+        service: data.service,
+        budget: data.budget,
+        description: data.description,
+        source: data.source,
+      });
+      toast.success(t("contact.success"));
+      form.reset();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to send message");
+    }
   }
 
   return (

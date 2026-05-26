@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Github, Linkedin, MapPin } from "lucide-react";
+import { Linkedin, MapPin } from "lucide-react";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { Section } from "@/components/layout/section";
 import { Card } from "@/components/ui/card";
 import { Logo } from "@/components/brand/logo";
+import { useSiteSettings } from "@/hooks/use-site-settings";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -21,10 +22,13 @@ export const Route = createFileRoute("/about")({
 });
 
 function AboutPage() {
+  const settings = useSiteSettings();
+  const linkedin = settings.linkedin_url?.trim();
+
   return (
     <PublicLayout>
       <div className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center min-h-[300px] flex flex-col justify-center">
-        <h1 className="font-display text-4xl sm:text-5xl font-bold">About RAAFAT-DIGITAL</h1>
+        <h1 className="font-display text-4xl sm:text-5xl font-bold">About {settings.site_name}</h1>
         <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
           A digital agency born in Ethiopia, built to help every kind of business thrive online.
         </p>
@@ -45,10 +49,10 @@ function AboutPage() {
           </div>
           <Card className="p-10 text-center bg-card border-border">
             <Logo size="lg" className="justify-center" />
-            <p className="mt-4 text-gold font-medium">We Digitalize Everything</p>
+            <p className="mt-4 text-gold font-medium">{settings.tagline}</p>
             <p className="mt-4 flex items-center justify-center gap-2 text-muted-foreground text-sm">
               <MapPin className="h-4 w-4 text-gold" />
-              Harar, Ethiopia 🇪🇹
+              {settings.address}
             </p>
           </Card>
         </div>
@@ -90,14 +94,19 @@ function AboutPage() {
             Full-stack developer and designer passionate about using technology to solve real
             problems for Ethiopian businesses. Every project gets my full attention and care.
           </p>
-          <div className="mt-6 flex justify-center gap-3">
-            <a href="#" className="text-muted-foreground hover:text-gold" aria-label="LinkedIn">
-              <Linkedin className="h-5 w-5" />
-            </a>
-            <a href="#" className="text-muted-foreground hover:text-gold" aria-label="GitHub">
-              <Github className="h-5 w-5" />
-            </a>
-          </div>
+          {linkedin && linkedin !== "#" && (
+            <div className="mt-6 flex justify-center gap-3">
+              <a
+                href={linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-gold"
+                aria-label="LinkedIn"
+              >
+                <Linkedin className="h-5 w-5" />
+              </a>
+            </div>
+          )}
         </Card>
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Growing — we're always looking for talented collaborators.{" "}

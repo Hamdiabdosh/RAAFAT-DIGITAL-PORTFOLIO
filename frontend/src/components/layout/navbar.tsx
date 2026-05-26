@@ -15,7 +15,7 @@ export function Navbar() {
   const links = [
     { to: "/" as const, label: t("nav.home") },
     { to: "/services" as const, label: t("nav.services") },
-    { to: "/portfolio" as const, label: t("nav.portfolio") },
+    { to: "/portfolio" as const, label: t("nav.projects") },
     { to: "/blog" as const, label: t("nav.blog") },
     { to: "/about" as const, label: t("nav.about") },
   ];

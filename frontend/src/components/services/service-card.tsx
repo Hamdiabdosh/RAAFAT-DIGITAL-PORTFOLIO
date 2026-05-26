@@ -2,14 +2,41 @@ import { Link } from "@tanstack/react-router";
 import { Code2, Globe, Palette, ShoppingCart } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useLanguage } from "@/context/language-context";
-import type { Service } from "@/data/services";
+import type { ApiService } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-const icons = { Globe, Palette, Code2, ShoppingCart };
+const icons = { Globe, Palette, Code2, ShoppingCart } as const;
 
-export function ServiceCard({ service }: { service: Service }) {
+export function serviceIcon(service: ApiService) {
+  return icons[service.icon as keyof typeof icons] ?? Globe;
+}
+
+export function ServiceIconVisual({
+  service,
+  className,
+}: {
+  service: ApiService;
+  className?: string;
+}) {
+  const Icon = serviceIcon(service);
+  return (
+    <div
+      className={cn(
+        "aspect-video rounded-xl border border-border bg-card flex flex-col items-center justify-center gap-4",
+        className,
+      )}
+    >
+      <div className="h-16 w-16 rounded-2xl bg-gold-dim border border-gold-soft flex items-center justify-center text-gold">
+        <Icon className="h-8 w-8" />
+      </div>
+      <p className="text-sm text-muted-foreground px-4 text-center">{service.subtitle}</p>
+    </div>
+  );
+}
+
+export function ServiceCard({ service }: { service: ApiService }) {
   const { t } = useLanguage();
-  const Icon = icons[service.icon];
+  const Icon = serviceIcon(service);
 
   return (
     <Card className="relative p-6 bg-card border-border hover:-translate-y-0.5 hover:border-gold-soft transition-all duration-200 group">
@@ -18,9 +45,7 @@ export function ServiceCard({ service }: { service: Service }) {
         <Icon className="h-5 w-5" />
       </div>
       <h3 className="mt-5 font-display text-xl font-semibold">{service.title}</h3>
-      <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-        {service.shortDescription}
-      </p>
+      <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{service.subtitle}</p>
       <p className="mt-4 text-sm font-medium text-gold">{service.startingPrice}</p>
       <Link
         to="/services/$slug"
@@ -33,7 +58,13 @@ export function ServiceCard({ service }: { service: Service }) {
   );
 }
 
-export function ServiceCardGrid({ services: items, className }: { services: Service[]; className?: string }) {
+export function ServiceCardGrid({
+  services: items,
+  className,
+}: {
+  services: ApiService[];
+  className?: string;
+}) {
   return (
     <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-5", className)}>
       {items.map((s) => (
