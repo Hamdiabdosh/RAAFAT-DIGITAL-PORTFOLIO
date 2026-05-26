@@ -1,121 +1,174 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Plus, Search, MoreVertical } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { Pencil, Plus } from "lucide-react";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/dashboard/page-header";
-import { StatusPill } from "@/components/dashboard/status-pill";
+import { ProjectFormDialog } from "@/components/dashboard/project-form-dialog";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
+import { Switch } from "@/components/ui/switch";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { api } from "@/lib/api";
+import { projectCategoryLabels } from "@/lib/content";
+import type { ApiProject, ProjectCategory } from "@/lib/types";
+
+type ProjectsSearch = {
+  create?: string;
+};
 
 export const Route = createFileRoute("/dashboard/projects")({
+  validateSearch: (search: Record<string, unknown>): ProjectsSearch => ({
+    create: typeof search.create === "string" ? search.create : undefined,
+  }),
   head: () => ({ meta: [{ title: "Projects — RAAFAT-DIGITAL" }] }),
   component: ProjectsPage,
 });
 
-type Status = "active" | "pending" | "paused" | "error";
-const all: { name: string; client: string; status: Status; revenue: string; progress: number; updated: string }[] = [
-  { name: "Aurora", client: "Northwind", status: "active", revenue: "$24,800", progress: 68, updated: "2h ago" },
-  { name: "Helios CMS", client: "Pylon", status: "pending", revenue: "$12,400", progress: 24, updated: "1d ago" },
-  { name: "Caelum Studio", client: "Caelum", status: "active", revenue: "$38,200", progress: 91, updated: "3d ago" },
-  { name: "Vega Mobile", client: "Vega Labs", status: "paused", revenue: "$6,000", progress: 42, updated: "1w ago" },
-  { name: "Orion Internal", client: "—", status: "error", revenue: "$0", progress: 8, updated: "1w ago" },
-  { name: "Lyra API", client: "Lyra Inc.", status: "active", revenue: "$18,200", progress: 55, updated: "5h ago" },
-];
-
 function ProjectsPage() {
-  const [q, setQ] = useState("");
-  const [filter, setFilter] = useState<string>("all");
-  const filtered = all.filter((p) =>
-    (filter === "all" || p.status === filter) &&
-    (p.name.toLowerCase().includes(q.toLowerCase()) || p.client.toLowerCase().includes(q.toLowerCase()))
-  );
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const search = Route.useSearch();
+  const [createOpen, setCreateOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState<ApiProject | null>(null);
+
+  useEffect(() => {
+    if (search.create) setCreateOpen(true);
+  }, [search.create]);
+
+  function handleCreateOpenChange(open: boolean) {
+    setCreateOpen(open);
+    if (!open && search.create) {
+      navigate({ to: "/dashboard/projects", search: {}, replace: true });
+    }
+  }
+
+  const { data: projects, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ["admin-projects"],
+    queryFn: () => api.admin.getProjects({ limit: "100" }) as Promise<ApiProject[]>,
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, body }: { id: string; body: object }) =>
+      api.admin.updateProject(id, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-projects"] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["stats"] });
+    },
+    onError: (err) => {
+      toast.error(err instanceof Error ? err.message : "Failed to update project");
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.admin.deleteProject(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-projects"] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["stats"] });
+      toast.success("Project deleted");
+    },
+    onError: (err) => {
+      toast.error(err instanceof Error ? err.message : "Failed to delete project");
+    },
+  });
 
   return (
     <>
+      <ProjectFormDialog open={createOpen} onOpenChange={handleCreateOpenChange} />
+      <ProjectFormDialog
+        project={editingProject}
+        open={!!editingProject}
+        onOpenChange={(open) => {
+          if (!open) setEditingProject(null);
+        }}
+      />
+
       <PageHeader
         title="Projects"
-        subtitle={`${filtered.length} project${filtered.length === 1 ? "" : "s"}`}
+        subtitle="Manage portfolio case studies shown on the public site"
         actions={
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button size="sm"><Plus className="h-4 w-4" /> New Project</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create project</DialogTitle>
-                <DialogDescription>Set up a new project workspace.</DialogDescription>
-              </DialogHeader>
-              <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); toast.success("Project created"); }}>
-                <div className="space-y-1.5">
-                  <Label htmlFor="pn">Project name</Label>
-                  <Input id="pn" placeholder="Aurora" required />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="pc">Client</Label>
-                  <Input id="pc" placeholder="Northwind" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="pd">Description</Label>
-                  <Textarea id="pd" rows={3} placeholder="Brief..." />
-                </div>
-                <DialogFooter>
-                  <Button type="submit">Create</Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+          <Button size="sm" onClick={() => setCreateOpen(true)}>
+            <Plus className="h-4 w-4" />
+            New project
+          </Button>
         }
       />
 
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search projects..." className="pl-9" />
-        </div>
-        <Select value={filter} onValueChange={setFilter}>
-          <SelectTrigger className="w-full sm:w-44"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="paused">Paused</SelectItem>
-            <SelectItem value="error">Error</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      {isLoading && (
+        <p className="text-sm text-muted-foreground">Loading projects…</p>
+      )}
+      {isError && (
+        <Card className="p-6 bg-card">
+          <p className="text-sm text-destructive">{error?.message ?? "Failed to load projects"}</p>
+          <Button variant="outline" size="sm" className="mt-4" onClick={() => refetch()}>
+            Retry
+          </Button>
+        </Card>
+      )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtered.map((p) => (
-          <Card key={p.name} className="p-5 bg-card hover:border-gold-soft hover:-translate-y-0.5 transition-all">
-            <div className="flex items-start justify-between">
-              <div className="min-w-0">
-                <h3 className="font-display text-lg font-semibold truncate">{p.name}</h3>
-                <p className="text-sm text-muted-foreground truncate">{p.client}</p>
-              </div>
-              <Button variant="ghost" size="icon" aria-label="Actions"><MoreVertical className="h-4 w-4" /></Button>
-            </div>
-            <div className="mt-4 flex items-center justify-between">
-              <StatusPill status={p.status} />
-              <span className="text-sm font-medium text-gold">{p.revenue}</span>
-            </div>
-            <div className="mt-4">
-              <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
-                <span>Progress</span><span>{p.progress}%</span>
-              </div>
-              <Progress value={p.progress} className="h-1.5" />
-            </div>
-            <p className="mt-4 text-xs text-muted-foreground">Updated {p.updated}</p>
-          </Card>
-        ))}
-      </div>
+      {!isLoading && !isError && (
+        <Card className="overflow-hidden bg-card">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Title</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Client</TableHead>
+                <TableHead>Published</TableHead>
+                <TableHead>Order</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {(projects ?? []).map((p) => (
+                <TableRow key={p.id}>
+                  <TableCell className="font-medium">{p.title}</TableCell>
+                  <TableCell>
+                    {projectCategoryLabels[p.category as ProjectCategory] ?? p.category}
+                  </TableCell>
+                  <TableCell>{p.client}</TableCell>
+                  <TableCell>
+                    <Switch
+                      checked={p.published}
+                      onCheckedChange={(published) =>
+                        updateMutation.mutate({ id: p.id, body: { published } })
+                      }
+                    />
+                  </TableCell>
+                  <TableCell>{p.order}</TableCell>
+                  <TableCell className="text-right space-x-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditingProject(p)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive"
+                      onClick={() => deleteMutation.mutate(p.id)}
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {!projects?.length && (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    No projects yet — click New project to add one.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </Card>
+      )}
     </>
   );
 }

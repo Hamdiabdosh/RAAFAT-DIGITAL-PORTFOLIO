@@ -1,10 +1,7 @@
 import type { ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./app-sidebar";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 
 export function AppLayout({ children }: { children: ReactNode }) {
   return (
@@ -18,12 +15,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
-              <Button asChild size="sm">
-                <Link to="/dashboard/projects" search={{ create: "1" }}>
-                  <Plus className="h-4 w-4" />
-                  New Project
-                </Link>
-              </Button>
             </div>
           </header>
           <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden">{children}</main>

@@ -220,6 +220,17 @@ async function main() {
       technologies: ["React", "Node.js", "PostgreSQL"],
       timeline: "8 weeks",
       metrics: { traffic: "+40%", delivery: "8 weeks", satisfaction: "100%" },
+      features: [
+        "Multi-vendor storefront with role-based admin",
+        "Integrated payment and order tracking",
+        "Mobile-first product discovery",
+        "Vendor onboarding workflow",
+      ],
+      liveUrl: "https://example.com/addis-marketplace",
+      technicalNotes:
+        "We chose PostgreSQL for transactional integrity across vendors and orders, and split the admin dashboard from the public storefront for clearer security boundaries.",
+      nextSteps:
+        "Planned enhancements include automated vendor payouts and advanced inventory forecasting.",
       featured: true,
       order: 0,
     },
@@ -302,7 +313,12 @@ async function main() {
 
   for (const p of projects) {
     await prisma.project.create({
-      data: { ...p, images: [], published: true },
+      data: {
+        ...p,
+        features: "features" in p && Array.isArray(p.features) ? p.features : [],
+        images: [],
+        published: true,
+      },
     });
   }
 

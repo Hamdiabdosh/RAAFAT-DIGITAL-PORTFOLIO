@@ -49,11 +49,18 @@ model Project {
   challenge    String
   solution     String
   result       String
-  technologies String[]
-  timeline     String
-  coverImage   String?
-  images       String[]
-  metrics      Json?
+  technologies       String[]
+  features           String[] @default([])
+  timeline           String
+  coverImage         String?
+  images             String[]
+  liveUrl            String?
+  githubUrl          String?
+  videoUrl           String?
+  technicalNotes     String?
+  architectureImage  String?
+  nextSteps          String?
+  metrics            Json?
   featured     Boolean         @default(false)
   published    Boolean         @default(true)
   order        Int             @default(0)

@@ -1,0 +1,179 @@
+
+<style>
+  h2.sr-only { position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0) }
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-tertiary);
+    margin: 0 0 6px;
+  }
+  .card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 10px;
+  }
+  .card-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin: 0 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-desc {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin: 0;
+    line-height: 1.5;
+  }
+  .badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+  .badge-must {
+    background: #E1F5EE;
+    color: #0F6E56;
+  }
+  .badge-good {
+    background: #E6F1FB;
+    color: #185FA5;
+  }
+  .badge-optional {
+    background: #F1EFE8;
+    color: #5F5E5A;
+  }
+  .section-header {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin: 1.5rem 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-header::after {
+    content:'';
+    flex:1;
+    height:0.5px;
+    background: var(--color-border-tertiary);
+  }
+  .legend {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .dot-must { background: #1D9E75; }
+  .dot-good { background: #378ADD; }
+  .dot-optional { background: #888780; }
+</style>
+
+<h2 class="sr-only">Portfolio project page anatomy — what sections and elements to include</h2>
+
+<div style="padding: 1rem 0 0;">
+
+  <div class="legend">
+    <div class="legend-item"><div class="dot dot-must"></div>Must have</div>
+    <div class="legend-item"><div class="dot dot-good"></div>Highly recommended</div>
+    <div class="legend-item"><div class="dot dot-optional"></div>Nice to have</div>
+  </div>
+
+  <div class="section-header">The hero — first thing they see</div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-photo" aria-hidden="true"></i> Hero screenshot or demo <span class="badge badge-must">Must have</span></div>
+    <p class="card-desc">A big, high-quality screenshot or short video/GIF showing the app in action. This is the first impression — make it count. Show the most visually impressive or useful part of the UI.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-align-left" aria-hidden="true"></i> Project title + one-liner <span class="badge badge-must">Must have</span></div>
+    <p class="card-desc">A clear name and a single sentence explaining what it does and who it's for. E.g. "TaskFlow — a drag-and-drop task manager for remote teams." No jargon, no buzzwords.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-tag" aria-hidden="true"></i> Tech stack tags <span class="badge badge-must">Must have</span></div>
+    <p class="card-desc">Small pill badges showing the core technologies used — React, PostgreSQL, AWS, etc. Recruiters scan these instantly. Keep it to 4–6 most relevant ones.</p>
+  </div>
+
+  <div class="section-header">The story — what you built and why</div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-file-description" aria-hidden="true"></i> Problem + solution writeup <span class="badge badge-must">Must have</span></div>
+    <p class="card-desc">A short narrative — what problem were you solving? What decisions did you make and why? This shows how you think, not just what you built. 2–4 paragraphs is ideal.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-list-check" aria-hidden="true"></i> Key features list <span class="badge badge-must">Must have</span></div>
+    <p class="card-desc">3–6 bullet points of the most interesting or technically challenging things the app does. Focus on things that demonstrate your skill, not generic stuff like "user authentication."</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-camera" aria-hidden="true"></i> Multiple screenshots / screen recording <span class="badge badge-good">Highly recommended</span></div>
+    <p class="card-desc">Show different states of the app — a dashboard, a detail view, a mobile view, an empty state, an error state. 3–5 images tells a much fuller story than one hero shot.</p>
+  </div>
+
+  <div class="section-header">The proof — show it's real and working</div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-brand-github" aria-hidden="true"></i> GitHub link <span class="badge badge-must">Must have</span></div>
+    <p class="card-desc">Link directly to the repo. Make sure the README is clean — it's the first thing interviewers open. Include setup instructions, a brief overview, and screenshots inside the README too.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-external-link" aria-hidden="true"></i> Live demo link <span class="badge badge-good">Highly recommended</span></div>
+    <p class="card-desc">A deployed version they can actually click around. Vercel, Netlify, Railway — pick one. If the project can't be live (cost, private data), a video walkthrough is the next best thing.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-player-play" aria-hidden="true"></i> Demo video / Loom walkthrough <span class="badge badge-good">Highly recommended</span></div>
+    <p class="card-desc">A 2–3 minute walkthrough where you show and explain the app. This is especially powerful if the live demo is unavailable or hard to explore without context. Embed it directly on the page.</p>
+  </div>
+
+  <div class="section-header">The depth — for technical credibility</div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-tools" aria-hidden="true"></i> Technical challenges & decisions <span class="badge badge-good">Highly recommended</span></div>
+    <p class="card-desc">What was hard? What trade-offs did you make? ("I chose Redis for session caching over cookies because…") This is gold for senior roles — shows you can reason about architecture, not just implement it.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-sitemap" aria-hidden="true"></i> Architecture diagram <span class="badge badge-optional">Nice to have</span></div>
+    <p class="card-desc">A simple diagram of how the system fits together — frontend, backend, database, APIs, third-party services. Very impressive for full-stack or backend-heavy projects.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-chart-line" aria-hidden="true"></i> Metrics or outcomes <span class="badge badge-optional">Nice to have</span></div>
+    <p class="card-desc">If the project was used by real people, mention it. "Used by 200+ beta users", "reduced load time by 60%", "deployed at company X." Numbers build instant credibility.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-route" aria-hidden="true"></i> What you'd do next / known limitations <span class="badge badge-optional">Nice to have</span></div>
+    <p class="card-desc">Shows self-awareness and product thinking. "If I had more time I'd add X" or "the current caching strategy doesn't scale to Y" tells interviewers you understand your own work critically.</p>
+  </div>
+
+  <div class="section-header">Navigation — don't trap them</div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-arrow-left" aria-hidden="true"></i> Back to portfolio / next project <span class="badge badge-must">Must have</span></div>
+    <p class="card-desc">Easy navigation back to the main projects list and ideally a "next project →" link. Never make a recruiter hit the browser back button to see more of your work.</p>
+  </div>
+
+</div>

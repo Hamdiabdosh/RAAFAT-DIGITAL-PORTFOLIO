@@ -27,8 +27,13 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
 import { Route as PortfolioSlugRouteImport } from './routes/portfolio.$slug'
 import { Route as DashboardUsersRouteImport } from './routes/dashboard.users'
+import { Route as DashboardTestimonialsRouteImport } from './routes/dashboard.testimonials'
+import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
 import { Route as DashboardProjectsRouteImport } from './routes/dashboard.projects'
+import { Route as DashboardPortfolioRouteImport } from './routes/dashboard.portfolio'
+import { Route as DashboardMessagesRouteImport } from './routes/dashboard.messages'
 import { Route as DashboardContentRouteImport } from './routes/dashboard.content'
+import { Route as DashboardBlogRouteImport } from './routes/dashboard.blog'
 import { Route as DashboardBillingRouteImport } from './routes/dashboard.billing'
 import { Route as DashboardAnalyticsRouteImport } from './routes/dashboard.analytics'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
@@ -123,14 +128,39 @@ const DashboardUsersRoute = DashboardUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardTestimonialsRoute = DashboardTestimonialsRouteImport.update({
+  id: '/testimonials',
+  path: '/testimonials',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardProjectsRoute = DashboardProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardPortfolioRoute = DashboardPortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardMessagesRoute = DashboardMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardContentRoute = DashboardContentRouteImport.update({
   id: '/content',
   path: '/content',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardBlogRoute = DashboardBlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardBillingRoute = DashboardBillingRouteImport.update({
@@ -167,8 +197,13 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
+  '/dashboard/blog': typeof DashboardBlogRoute
   '/dashboard/content': typeof DashboardContentRoute
+  '/dashboard/messages': typeof DashboardMessagesRoute
+  '/dashboard/portfolio': typeof DashboardPortfolioRoute
   '/dashboard/projects': typeof DashboardProjectsRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/testimonials': typeof DashboardTestimonialsRoute
   '/dashboard/users': typeof DashboardUsersRoute
   '/portfolio/$slug': typeof PortfolioSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
@@ -191,8 +226,13 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
+  '/dashboard/blog': typeof DashboardBlogRoute
   '/dashboard/content': typeof DashboardContentRoute
+  '/dashboard/messages': typeof DashboardMessagesRoute
+  '/dashboard/portfolio': typeof DashboardPortfolioRoute
   '/dashboard/projects': typeof DashboardProjectsRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/testimonials': typeof DashboardTestimonialsRoute
   '/dashboard/users': typeof DashboardUsersRoute
   '/portfolio/$slug': typeof PortfolioSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
@@ -217,8 +257,13 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
+  '/dashboard/blog': typeof DashboardBlogRoute
   '/dashboard/content': typeof DashboardContentRoute
+  '/dashboard/messages': typeof DashboardMessagesRoute
+  '/dashboard/portfolio': typeof DashboardPortfolioRoute
   '/dashboard/projects': typeof DashboardProjectsRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/testimonials': typeof DashboardTestimonialsRoute
   '/dashboard/users': typeof DashboardUsersRoute
   '/portfolio/$slug': typeof PortfolioSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
@@ -244,8 +289,13 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/dashboard/analytics'
     | '/dashboard/billing'
+    | '/dashboard/blog'
     | '/dashboard/content'
+    | '/dashboard/messages'
+    | '/dashboard/portfolio'
     | '/dashboard/projects'
+    | '/dashboard/settings'
+    | '/dashboard/testimonials'
     | '/dashboard/users'
     | '/portfolio/$slug'
     | '/services/$slug'
@@ -268,8 +318,13 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/dashboard/analytics'
     | '/dashboard/billing'
+    | '/dashboard/blog'
     | '/dashboard/content'
+    | '/dashboard/messages'
+    | '/dashboard/portfolio'
     | '/dashboard/projects'
+    | '/dashboard/settings'
+    | '/dashboard/testimonials'
     | '/dashboard/users'
     | '/portfolio/$slug'
     | '/services/$slug'
@@ -293,8 +348,13 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/dashboard/analytics'
     | '/dashboard/billing'
+    | '/dashboard/blog'
     | '/dashboard/content'
+    | '/dashboard/messages'
+    | '/dashboard/portfolio'
     | '/dashboard/projects'
+    | '/dashboard/settings'
+    | '/dashboard/testimonials'
     | '/dashboard/users'
     | '/portfolio/$slug'
     | '/services/$slug'
@@ -446,6 +506,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardUsersRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/testimonials': {
+      id: '/dashboard/testimonials'
+      path: '/testimonials'
+      fullPath: '/dashboard/testimonials'
+      preLoaderRoute: typeof DashboardTestimonialsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/settings': {
+      id: '/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/projects': {
       id: '/dashboard/projects'
       path: '/projects'
@@ -453,11 +527,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProjectsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/portfolio': {
+      id: '/dashboard/portfolio'
+      path: '/portfolio'
+      fullPath: '/dashboard/portfolio'
+      preLoaderRoute: typeof DashboardPortfolioRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/messages': {
+      id: '/dashboard/messages'
+      path: '/messages'
+      fullPath: '/dashboard/messages'
+      preLoaderRoute: typeof DashboardMessagesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/content': {
       id: '/dashboard/content'
       path: '/content'
       fullPath: '/dashboard/content'
       preLoaderRoute: typeof DashboardContentRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/blog': {
+      id: '/dashboard/blog'
+      path: '/blog'
+      fullPath: '/dashboard/blog'
+      preLoaderRoute: typeof DashboardBlogRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/billing': {
@@ -497,8 +592,13 @@ const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 interface DashboardRouteChildren {
   DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
   DashboardBillingRoute: typeof DashboardBillingRoute
+  DashboardBlogRoute: typeof DashboardBlogRoute
   DashboardContentRoute: typeof DashboardContentRoute
+  DashboardMessagesRoute: typeof DashboardMessagesRoute
+  DashboardPortfolioRoute: typeof DashboardPortfolioRoute
   DashboardProjectsRoute: typeof DashboardProjectsRoute
+  DashboardSettingsRoute: typeof DashboardSettingsRoute
+  DashboardTestimonialsRoute: typeof DashboardTestimonialsRoute
   DashboardUsersRoute: typeof DashboardUsersRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
@@ -506,8 +606,13 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAnalyticsRoute: DashboardAnalyticsRoute,
   DashboardBillingRoute: DashboardBillingRoute,
+  DashboardBlogRoute: DashboardBlogRoute,
   DashboardContentRoute: DashboardContentRoute,
+  DashboardMessagesRoute: DashboardMessagesRoute,
+  DashboardPortfolioRoute: DashboardPortfolioRoute,
   DashboardProjectsRoute: DashboardProjectsRoute,
+  DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardTestimonialsRoute: DashboardTestimonialsRoute,
   DashboardUsersRoute: DashboardUsersRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }

@@ -94,9 +94,16 @@ export async function create(req: Request, res: Response) {
       solution: body.solution,
       result: body.result,
       technologies: body.technologies ?? [],
+      features: body.features ?? [],
       timeline: body.timeline,
       coverImage: body.coverImage ?? null,
       images: body.images ?? [],
+      liveUrl: body.liveUrl || null,
+      githubUrl: body.githubUrl || null,
+      videoUrl: body.videoUrl || null,
+      technicalNotes: body.technicalNotes ?? null,
+      architectureImage: body.architectureImage ?? null,
+      nextSteps: body.nextSteps ?? null,
       metrics: body.metrics ?? undefined,
       featured: body.featured ?? false,
       published: body.published ?? true,
@@ -148,6 +155,7 @@ export async function remove(req: Request, res: Response) {
   }
 
   deleteFileIfLocal(project.coverImage);
+  deleteFileIfLocal(project.architectureImage);
   project.images.forEach(deleteFileIfLocal);
 
   await prisma.project.delete({ where: { id } });

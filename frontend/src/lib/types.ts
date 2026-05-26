@@ -23,9 +23,16 @@ export type ApiProject = {
   solution: string;
   result: string;
   technologies: string[];
+  features: string[];
   timeline: string;
   coverImage?: string | null;
   images: string[];
+  liveUrl?: string | null;
+  githubUrl?: string | null;
+  videoUrl?: string | null;
+  technicalNotes?: string | null;
+  architectureImage?: string | null;
+  nextSteps?: string | null;
   metrics?: Record<string, string> | null;
   featured: boolean;
   published: boolean;
