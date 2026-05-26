@@ -14,6 +14,8 @@ const envSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   SMTP_FROM: z.string().default("RAAFAT-DIGITAL <hello@raafat.digital>"),
+  RESEND_API_KEY: z.string().optional(),
+  RESEND_FROM: z.string().default("RAAFAT-DIGITAL <hello@raafat.digital>"),
   NOTIFICATION_EMAIL: z.string().email().default("hello@raafat.digital"),
   FRONTEND_URL: z.string().url().default("http://localhost:5173"),
   UPLOAD_DIR: z.string().default("./uploads"),

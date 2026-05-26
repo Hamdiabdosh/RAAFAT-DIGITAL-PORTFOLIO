@@ -1,9 +1,10 @@
 import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import { env } from "../../config/env";
 
 const GOLD = "#D4A017";
 
-function transporter() {
+function smtpTransporter() {
   if (!env.SMTP_USER || !env.SMTP_PASS) {
     return null;
   }
@@ -106,10 +107,37 @@ function clientConfirmationHtml(data: ContactEmailData) {
 </html>`;
 }
 
-export async function sendContactEmails(data: ContactEmailData) {
-  const transport = transporter();
+async function sendViaResend(data: ContactEmailData) {
+  const resend = new Resend(env.RESEND_API_KEY);
+
+  const [adminResult, clientResult] = await Promise.all([
+    resend.emails.send({
+      from: env.RESEND_FROM,
+      to: env.NOTIFICATION_EMAIL,
+      replyTo: data.email,
+      subject: `🔔 New enquiry from ${data.name} — RAAFAT-DIGITAL`,
+      html: adminNotificationHtml(data),
+    }),
+    resend.emails.send({
+      from: env.RESEND_FROM,
+      to: data.email,
+      subject: "We got your message — RAAFAT-DIGITAL 🙌",
+      html: clientConfirmationHtml(data),
+    }),
+  ]);
+
+  if (adminResult.error) {
+    throw new Error(`Resend admin email failed: ${adminResult.error.message}`);
+  }
+  if (clientResult.error) {
+    throw new Error(`Resend confirmation email failed: ${clientResult.error.message}`);
+  }
+}
+
+async function sendViaSmtp(data: ContactEmailData) {
+  const transport = smtpTransporter();
   if (!transport) {
-    console.warn("SMTP not configured — skipping contact emails");
+    console.warn("Email not configured — set RESEND_API_KEY or SMTP_USER/SMTP_PASS");
     return;
   }
 
@@ -128,4 +156,13 @@ export async function sendContactEmails(data: ContactEmailData) {
       html: clientConfirmationHtml(data),
     }),
   ]);
+}
+
+export async function sendContactEmails(data: ContactEmailData) {
+  if (env.RESEND_API_KEY) {
+    await sendViaResend(data);
+    return;
+  }
+
+  await sendViaSmtp(data);
 }
