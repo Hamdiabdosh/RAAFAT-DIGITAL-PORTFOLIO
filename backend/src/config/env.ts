@@ -5,6 +5,8 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(3001),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
+  /** Supabase direct connection (port 5432) — used by Prisma migrate; pooler URL goes in DATABASE_URL */
+  DIRECT_URL: z.string().min(1, "DIRECT_URL is required"),
   JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
   JWT_EXPIRES_IN: z.string().default("7d"),
   ADMIN_EMAIL: z.string().email().default("admin@raafat.digital"),
@@ -18,8 +20,11 @@ const envSchema = z.object({
   RESEND_FROM: z.string().default("RAAFAT-DIGITAL <hello@raafat.digital>"),
   NOTIFICATION_EMAIL: z.string().email().default("hello@raafat.digital"),
   FRONTEND_URL: z.string().url().default("http://localhost:5173"),
+  /** Legacy local uploads only — new images use Cloudinary URLs */
   UPLOAD_DIR: z.string().default("./uploads"),
-  MAX_FILE_SIZE_MB: z.coerce.number().default(5),
+  CLOUDINARY_CLOUD_NAME: z.string().optional(),
+  CLOUDINARY_API_KEY: z.string().optional(),
+  CLOUDINARY_API_SECRET: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

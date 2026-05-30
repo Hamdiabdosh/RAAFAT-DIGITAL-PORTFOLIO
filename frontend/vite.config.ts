@@ -5,10 +5,15 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
-// Custom SSR error wrapper — wrangler.jsonc main alone is insufficient for Cloudflare builds.
+const useCloudflare = process.env.DEPLOY_TARGET === "cloudflare";
+
+// Vercel: connect GitHub repo with root directory `frontend` (native TanStack Start detection).
+// Cloudflare: DEPLOY_TARGET=cloudflare npm run build
 export default defineConfig({
   plugins: [
-    cloudflare({ viteEnvironment: { name: "ssr" } }),
+    ...(useCloudflare
+      ? [cloudflare({ viteEnvironment: { name: "ssr" } })]
+      : []),
     tanstackStart({
       server: { entry: "server" },
     }),

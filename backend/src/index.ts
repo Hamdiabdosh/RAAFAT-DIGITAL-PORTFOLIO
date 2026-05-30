@@ -3,8 +3,6 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
-import path from "path";
-import fs from "fs";
 import { env } from "./config/env";
 import { errorHandler } from "./middleware/error";
 import { requireAuth } from "./middleware/auth";
@@ -18,8 +16,6 @@ import settingsPublicRouter from "./modules/settings/settings-public.router";
 import adminRouter from "./modules/admin/admin.router";
 
 const app = express();
-
-fs.mkdirSync(env.UPLOAD_DIR, { recursive: true });
 
 app.use(helmet());
 app.use(
@@ -41,8 +37,6 @@ app.use(
 app.use(morgan(env.NODE_ENV === "production" ? "combined" : "dev"));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
-
-app.use("/uploads", express.static(path.resolve(env.UPLOAD_DIR)));
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });

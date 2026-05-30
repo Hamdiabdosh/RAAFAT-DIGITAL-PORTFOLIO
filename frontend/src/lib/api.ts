@@ -175,11 +175,11 @@ export const api = {
     deleteTestimonial: (id: string) =>
       request<{ message: string }>(`/admin/testimonials/${id}`, { method: "DELETE" }),
 
-    uploadImage: (formData: FormData) =>
-      request<{ files: { url: string; filename: string; size: number }[] }>(
-        "/admin/upload",
-        { method: "POST", body: formData },
-      ),
+    deleteImage: (url: string) =>
+      request<{ message: string }>("/admin/upload", {
+        method: "DELETE",
+        body: JSON.stringify({ url }),
+      }),
 
     getSettings: () => request<Record<string, string>>("/admin/settings"),
 

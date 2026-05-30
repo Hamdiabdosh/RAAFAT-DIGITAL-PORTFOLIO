@@ -31,6 +31,10 @@ cd frontend
 bun run build
 ```
 
+## Deployment
+
+**Vercel (frontend)** + **Render (backend)** + **Supabase (PostgreSQL)** + **Cloudinary** — see **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** (`npm run deploy:vercel` in `frontend/`).
+
 ## Routes
 
 | Path | Description |

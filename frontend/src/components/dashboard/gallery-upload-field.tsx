@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { api } from "@/lib/api";
+import { uploadImagesToCloudinary } from "@/lib/cloudinary";
 import { mediaUrl } from "@/lib/media";
 
 export function GalleryUploadField({
@@ -21,13 +21,8 @@ export function GalleryUploadField({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const uploadMutation = useMutation({
-    mutationFn: async (files: FileList) => {
-      const formData = new FormData();
-      Array.from(files).forEach((file) => formData.append("images", file));
-      return api.admin.uploadImage(formData);
-    },
-    onSuccess: (data) => {
-      const urls = data.files.map((f) => f.url);
+    mutationFn: (files: FileList) => uploadImagesToCloudinary(Array.from(files)),
+    onSuccess: (urls) => {
       onChange([...value, ...urls]);
       toast.success(`${urls.length} image(s) added`);
     },

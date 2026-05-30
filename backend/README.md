@@ -1,6 +1,16 @@
 # RAAFAT-DIGITAL Backend
 
-Node.js/Express REST API with PostgreSQL (Prisma), JWT auth, file uploads, and Nodemailer contact notifications.
+Node.js/Express REST API with PostgreSQL (Prisma + Supabase), JWT auth, Cloudinary-backed media (client upload, server delete), and email contact notifications.
+
+## Production deploy (Render + Supabase)
+
+See **[../docs/DEPLOYMENT.md](../docs/DEPLOYMENT.md)** for Supabase setup, Render web service, env vars, and migrations.
+
+Quick reference:
+
+- **Database:** Supabase → `DATABASE_URL` (pooler) + `DIRECT_URL` (direct) in Render env
+- **API:** Render web service, root `backend/`, start command runs `prisma migrate deploy` then `npm start`
+- **Blueprint:** [`../render.yaml`](../render.yaml) at repo root
 
 ## Local Setup
 
@@ -16,10 +26,11 @@ Node.js/Express REST API with PostgreSQL (Prisma), JWT auth, file uploads, and N
    cp .env.example .env
    ```
 
-3. Start a local PostgreSQL database (or use Railway's CLI to connect to remote):
+   For local Postgres, set `DATABASE_URL` and `DIRECT_URL` to the same connection string.
+
+3. Start PostgreSQL (Docker example):
 
    ```bash
-   # Using Docker:
    docker run --name raafat-db -e POSTGRES_PASSWORD=password -e POSTGRES_DB=raafat_digital -p 5432:5432 -d postgres
    ```
 
@@ -52,5 +63,6 @@ Prisma Studio: `npm run db:studio` → http://localhost:5555
 | `npm run dev` | Start dev server with hot reload |
 | `npm run build` | Compile TypeScript |
 | `npm start` | Run production build |
+| `npm run db:migrate` | Apply migrations (production / Supabase) |
 | `npm run db:migrate:dev` | Create/apply migrations (dev) |
 | `npm run db:seed` | Seed admin + content |

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { api } from "@/lib/api";
+import { uploadImageToCloudinary } from "@/lib/cloudinary";
 import { mediaUrl } from "@/lib/media";
 import { cn } from "@/lib/utils";
 
@@ -30,17 +30,10 @@ export function ImageUploadField({
   const preview = mediaUrl(value);
 
   const uploadMutation = useMutation({
-    mutationFn: async (file: File) => {
-      const formData = new FormData();
-      formData.append("images", file);
-      return api.admin.uploadImage(formData);
-    },
-    onSuccess: (data) => {
-      const url = data.files[0]?.url;
-      if (url) {
-        onChange(url);
-        toast.success("Image uploaded");
-      }
+    mutationFn: (file: File) => uploadImageToCloudinary(file),
+    onSuccess: (url) => {
+      onChange(url);
+      toast.success("Image uploaded");
     },
     onError: (err) => {
       toast.error(err instanceof Error ? err.message : "Upload failed");
@@ -86,7 +79,7 @@ export function ImageUploadField({
       <div className="flex gap-2">
         <Input
           id={id}
-          placeholder="Or paste image URL /uploads/..."
+          placeholder="Or paste image URL (https://...)"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="text-sm"

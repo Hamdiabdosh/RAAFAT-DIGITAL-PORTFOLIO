@@ -1,17 +1,9 @@
-import fs from "fs";
-import path from "path";
 import type { Request, Response } from "express";
 import { ProjectCategory, type Prisma } from "@prisma/client";
 import { prisma } from "../../config/prisma";
-import { env } from "../../config/env";
+import { deleteMediaFile } from "../../utils/media";
 import { uniqueSlug } from "../../utils/slug";
 import { sendError, sendSuccess, sendSuccessList } from "../../utils/response";
-
-function deleteFileIfLocal(url: string | null | undefined) {
-  if (!url || !url.startsWith("/uploads/")) return;
-  const filePath = path.join(env.UPLOAD_DIR, url.replace("/uploads/", ""));
-  if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-}
 
 export async function listPublic(req: Request, res: Response) {
   const { category, featured, limit } = req.query as unknown as {
@@ -154,9 +146,9 @@ export async function remove(req: Request, res: Response) {
     return sendError(res, "Project not found", "NOT_FOUND", 404);
   }
 
-  deleteFileIfLocal(project.coverImage);
-  deleteFileIfLocal(project.architectureImage);
-  project.images.forEach(deleteFileIfLocal);
+  await deleteMediaFile(project.coverImage);
+  await deleteMediaFile(project.architectureImage);
+  await Promise.all(project.images.map((img) => deleteMediaFile(img)));
 
   await prisma.project.delete({ where: { id } });
   return sendSuccess(res, { message: "Deleted successfully" });
